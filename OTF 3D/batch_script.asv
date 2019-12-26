@@ -10,5 +10,7 @@ phaseTF = generate_phase_tf(p);
 objectFiltered = imag(ifftn(fftn(object).*ifftshift(phaseTF)));
 
 %%
-toShow = throughFocusAndAxialSlice(objectFiltered,[-40 -32 -24 -16 -8 0 8 16 24 32 40]);
+toShow = throughFocusAndAxialSlice(objectFiltered
+toShow = ([objectFiltered(:,:,end/2+1) , squeeze(objectFiltered(end/2+1,:,:))' ]);
+toShow = (toShow-min(toShow(:)))./(max(toShow(:))-min(toShow(:)));
 imshow(toShow)

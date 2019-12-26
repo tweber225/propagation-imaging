@@ -17,15 +17,25 @@ switch p.objectType
         [xGr,yGr,zGr] = meshgrid(dimIdx,dimIdx,dimIdx);
         
         % Add centered sphere to object
-        sphereRadiusInPixels = p.sphereRadius/p.pixelSize;
+        sphereRadiusInPixels = p.radius/p.pixelSize;
         sph = p.deltaN*(xGr.^2+yGr.^2+zGr.^2 < sphereRadiusInPixels^2);
         object = object + sph;
-
+        
+    case 'tube'
+        % Make 2d indices
+        dimIdx = single((-arraySize/2):(arraySize/2-1));
+        [xGr,~,zGr] = meshgrid(dimIdx,1,dimIdx);
+        
+        % Add centered circle to 2D plane
+        circleRadiusInPixels = p.radius/p.pixelSize;
+        circ = p.deltaN*(xGr.^2 + zGr.^2 < circleRadiusInPixels^2);
+        object = object + repmat(circ,[arraySize 1 1]);
+        
     case 'monolayer'
         % Make 3d indices
         dimIdx = int16((-arraySize/2):(arraySize/2-1));
         [xGr,yGr,zGr] = meshgrid(dimIdx,dimIdx,dimIdx);
-        sphereRadiusInPixels = p.sphereRadius/p.pixelSize;
+        sphereRadiusInPixels = p.radius/p.pixelSize;
         
         % Determine sphere centers in hex lattice
         spacingInPixels = p.sphereCenterSpacing/p.pixelSize;
