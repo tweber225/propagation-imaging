@@ -1,5 +1,8 @@
 function toShow = throughFocusAndAxialSlice(filtObj,slices)
 
+%dZ = size(filtObj,3)/(numSlices-1);
+%slices = (-(numSlices-1)/2*dZ):dZ:(numSlices-1)/2*dZ;
+
 % Gather the slices
 toShow = [];
 for sIdx = slices

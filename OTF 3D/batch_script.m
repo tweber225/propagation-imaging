@@ -3,12 +3,16 @@
 load_params
 
 object = make_complex_object(p);
+objectSpectrum = fftn(object);
 
 phaseTF = generate_phase_tf(p);
 
-
-objectFiltered = imag(ifftn(fftn(object).*ifftshift(phaseTF)));
+objectSpectrumFiltered = objectSpectrum.*ifftshift(phaseTF);
+objectFiltered = imag(ifftn(objectSpectrumFiltered));
 
 %%
-toShow = throughFocusAndAxialSlice(objectFiltered,[-40 -32 -24 -16 -8 0 8 16 24 32 40]);
-imshow(toShow)
+numSlices = 9;
+sliceRange = 48;
+slices = linspace(-sliceRange,sliceRange,numSlices);
+toShow = throughFocusAndAxialSlice(objectFiltered,slices);
+figure;imshow(toShow)
