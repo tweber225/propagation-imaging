@@ -8,10 +8,10 @@ objectSpectrum = fftn(object);
 phaseTF = generate_phase_tf(p);
 
 objectSpectrumFiltered = objectSpectrum.*ifftshift(phaseTF);
-objectFiltered = imag(ifftn(objectSpectrumFiltered));
+objectFiltered = imag(ifftn(objectSpectrumFiltered)) + p.noiseLevel*randn(size(objectSpectrumFiltered));
 
 %%
-numSlices = 9;
+numSlices = 5;
 sliceRange = 48;
 slices = linspace(-sliceRange,sliceRange,numSlices);
 toShow = throughFocusAndAxialSlice(objectFiltered,slices);
