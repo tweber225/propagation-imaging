@@ -10,7 +10,8 @@ kzTrunc = kz.*((kx.^2+ky.^2) < transFreqCutOffIllum^2);
 
 % Asymmetric illumination
 if p.asymIllum 
-    kzTrunc = kzTrunc.*(kx<0);
+    kzTrunc = kzTrunc.*(kx<=0);
+    w(kx==0) = 0.5*w(kx==0);
 end
     
 % Find points that aren't zero 

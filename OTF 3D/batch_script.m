@@ -11,8 +11,12 @@ objectSpectrumFiltered = objectSpectrum.*ifftshift(phaseTF);
 objectFiltered = imag(ifftn(objectSpectrumFiltered)) + p.noiseLevel*randn(size(objectSpectrumFiltered));
 
 %%
-numSlices = 5;
-sliceRange = 48;
-slices = linspace(-sliceRange,sliceRange,numSlices);
+numSlices = 7;
+sliceRange = 15;
+slices = round(linspace(-sliceRange/p.pixelSize,sliceRange/p.pixelSize,numSlices));
 toShow = throughFocusAndAxialSlice(objectFiltered,slices);
 figure;imshow(toShow)
+
+%% Save image?
+toShow8b = uint8(toShow*255);
+%imwrite(toShow8b,'C:\Users\twebe\Desktop\pcoh33-asym-point.png');

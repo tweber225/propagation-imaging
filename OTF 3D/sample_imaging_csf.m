@@ -11,10 +11,10 @@ kzNotZero = kzTrunc>0;
 
 
 % Add pupil phase
-p = sqrt(kx.^2+ky.^2);
-p = p/max(p(kzNotZero));
-%w = w.*exp(-2i*pi*(2*p.^2-1));
-%w = w.*exp(-2i*pi*.2*(6*p.^4-6*p.^2+1));
+rho = sqrt(kx.^2+ky.^2);
+rho = rho/max(rho(kzNotZero));
+%w = w.*exp(-2i*pi*(2*rho.^2-1)*p.aberrationMag);
+w = w.*exp(-2i*pi*(6*rho.^4-6*rho.^2+1)*p.aberrationMag);
 %w = w.*exp(2i*pi*.35*randn(size(w)));
 
 % Make the sampled point locations of the imaging CSF
