@@ -43,6 +43,7 @@ end
 OTFReal = zeros([p.objectSize,p.objectSize,p.objectSize]/p.pixelSize,'single');
 OTFImag = OTFReal;
 
+sumIdx = 0;
 for kzIdx = minZBin:spFreqPix:maxZBin
     binStart = kzIdx-.5*spFreqPix; binEnd = kzIdx+.5*spFreqPix;
     
@@ -62,6 +63,7 @@ for kzIdx = minZBin:spFreqPix:maxZBin
         for kxIdx = 1:length(kxUnique)
             % Select just matching kx
             zyx = zyConvCoords == kxUnique(kxIdx);
+            sumIdx = sumIdx+sum(zyx);
             OTFEntryReal = sum(real(zyConvAmps(zyx)));
             OTFEntryImag = sum(imag(zyConvAmps(zyx)));
             kx = find(kIdx==kxUnique(kxIdx),1);
@@ -71,7 +73,7 @@ for kzIdx = minZBin:spFreqPix:maxZBin
         end
         
     end   
-    disp(kzIdx)
+    disp(['OTF ' num2str(50*sumIdx/numConvPoints) '% assembled'])
 end
 
 phaseTF = OTFReal + 1i*OTFImag;

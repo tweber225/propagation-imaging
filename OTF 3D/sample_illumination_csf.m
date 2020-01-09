@@ -1,7 +1,6 @@
 function [coords,amps] = sample_illumination_csf(p,kx,ky,kz,w)
 
 
-
 % Calculate the max transverse frequency for illumination
 transFreqCutOffIllum = p.illuminationNA/p.lightWavelength;
 
