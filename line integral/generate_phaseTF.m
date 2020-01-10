@@ -8,8 +8,9 @@ wl = p.lightWavelength;     % um
 k = 1/wl;                   % um^-1
 spatFreqLim = minNA*k;      % um^-1, defines int limits of line integral
 
-% Make the CSFs
+% Make the CSFs, G
 [H,Hi] = make_imaging_illumination_csfs(p);
+G = make_greens_func(p);
 
 % Make parameter index
 t = linspace(-spatFreqLim,spatFreqLim,p.numLineIntPoints);
@@ -50,14 +51,13 @@ for kzdIdx = 1:numKzd
 
             % Break up the integrand a bit
             HtimesHStar = H(kx+kxd/2,ky+kyd/2).*conj(H(kx-kxd/2,ky-kyd/2));
-            %modsqrHiDiff = abs(Hi(-kx-kxd/2,-ky-kyd/2)).^2 - abs(Hi(-kx+kxd/2,-ky+kyd/2)).^2;
-            modsqrHiDiff = abs(Hi(-kx-kxd/2,-ky-kyd/2)).^2 - 0*abs(Hi(-kx+kxd/2,-ky+kyd/2)).^2;
+            GstarModsqrHi = conj(G(kx-kxd/2,ky+kyd/2)).*abs(Hi(-kx-kxd/2,-ky-kyd/2)).^2;
+            GModsqrHi = G(kx+kxd/2,ky+kyd/2).*abs(Hi(-kx+kxd/2,-ky+kyd/2)).^2;
 
             arcLengthTerm = sqrt(dkxdt.^2 + dkydt.^2 + dkzdt.^2);
 
             % Integrate
-            %phaseTF(kydIdx,kxdIdx,kzdIdx) = sum(HtimesHStar.*modsqrHiDiff.*arcLengthTerm);
-            phaseTF(kydIdx,kxdIdx,kzdIdx) = sum(modsqrHiDiff);
+            phaseTF(kydIdx,kxdIdx,kzdIdx) = sum(HtimesHStar.*(GstarModsqrHi+GModsqrHi).*arcLengthTerm);
             
         end % kxd looping
 
