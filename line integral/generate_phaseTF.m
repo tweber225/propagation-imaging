@@ -7,6 +7,7 @@ minNA = min(p.imagingNA,p.illuminationNA);
 wl = p.lightWavelength;     % um
 k = 1/wl;                   % um^-1
 spatFreqLim = minNA*k;      % um^-1, defines int limits of line integral
+smallOff = 1e-6;
 
 % Make the CSFs, G
 [H,Hi] = make_imaging_illumination_csfs(p);
@@ -23,7 +24,7 @@ phaseTF = zeros(numKyd,numKxd,numKzd,'single');
 
 % Loop through different kxd,kyd,kzd's
 for kzdIdx = 1:numKzd
-    kzd = kzdRequested(kzdIdx);
+    kzd = kzdRequested(kzdIdx)+smallOff;
     
     % Check that kzd does not equal zero (skip if does)
     if kzd == 0
@@ -31,19 +32,20 @@ for kzdIdx = 1:numKzd
     end
     
     for kydIdx = 1:numKyd
-        kyd = kydRequested(kydIdx);
+        kyd = kydRequested(kydIdx)+smallOff;
         
         for kxdIdx = 1:numKxd
-            kxd = kxdRequested(kxdIdx);
+            kxd = kxdRequested(kxdIdx)+smallOff;
     
             % Compute some constants
             Ry = sqrt(k^2 - (kxd^2+kzd^2)/4);
             Rx = Ry/sqrt(1 + kxd^2/kzd^2);
 
             % Parameterize kx, ky, kz and derivatives
-            kx = -Rx*cos(t);
+            kx = sign(kxd)*sign(kzd)*Rx*cos(t); 
             ky = Ry*sin(t);
-            kz = Rx*(kxd/kzd)*cos(t);
+            kz = -kx*(kxd/kzd);
+            %plot3(kx,ky,kz);hold on; xlabel('x'),ylabel('y'),zlabel('z');axis equal;drawnow
 
             dkxdt = Rx*sin(t);
             dkydt = Ry*cos(t);
@@ -64,5 +66,6 @@ for kzdIdx = 1:numKzd
     end % kyd looping
     
 end % kzd looping
+
 
 
