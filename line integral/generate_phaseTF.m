@@ -5,67 +5,72 @@ function phaseTF = generate_phaseTF(p,kxdRequested,kydRequested,kzdRequested)
 % Extract some parameters from p structure
 minNA = min(p.imagingNA,p.illuminationNA);
 wl = p.lightWavelength;     % um
+
+if strcmp(p.dataType,'single') % Convert parameters to requested data type
+    kxdRequested = single(kxdRequested);
+    kydRequested = single(kxdRequested);
+    kzdRequested = single(kxdRequested);
+    minNA = single(minNA);
+    wl = single(wl);
+end
+
+% Autocalculated parameters
 k = 1/wl;                   % um^-1
 spatFreqLim = minNA*k;      % um^-1, defines int limits of line integral
-smallOff = 1e-6;
 
 % Make the CSFs, G
 [H,Hi] = make_imaging_illumination_csfs(p);
 G = make_greens_func(p);
 
 % Make parameter index
-t = linspace(-spatFreqLim,spatFreqLim,p.numLineIntPoints);
+tRequested = linspace(-spatFreqLim,spatFreqLim,p.numLineIntPoints);
 
-% Allocate some space for phase transfer function
-numKyd = length(kydRequested);
-numKxd = length(kxdRequested);
-numKzd = length(kzdRequested);
-phaseTF = zeros(numKyd,numKxd,numKzd,'single');
+% Make grids of kxd, kyd, kzd, and parameter t
+[kxd,kyd,kzd,t] = ndgrid(kxdRequested,kydRequested,kzdRequested,tRequested);
 
-% Loop through different kxd,kyd,kzd's
-for kzdIdx = 1:numKzd
-    kzd = kzdRequested(kzdIdx)+smallOff;
-    
-    % Check that kzd does not equal zero (skip if does)
-    if kzd == 0
-        continue
-    end
-    
-    for kydIdx = 1:numKyd
-        kyd = kydRequested(kydIdx)+smallOff;
-        
-        for kxdIdx = 1:numKxd
-            kxd = kxdRequested(kxdIdx)+smallOff;
-    
-            % Compute some constants
-            Ry = sqrt(k^2 - (kxd^2+kzd^2)/4);
-            Rx = Ry/sqrt(1 + kxd^2/kzd^2);
+% Save where kzd is 0
+kzdCorrection = kzd(:,:,:,1) == 0;
 
-            % Parameterize kx, ky, kz and derivatives
-            kx = sign(kxd)*sign(kzd)*Rx*cos(t); 
-            ky = Ry*sin(t);
-            kz = -kx*(kxd/kzd);
-            %plot3(kx,ky,kz);hold on; xlabel('x'),ylabel('y'),zlabel('z');axis equal;drawnow
+% Transverse displacement
+ktransd = sqrt(kxd.^2+kyd.^2);
 
-            dkxdt = Rx*sin(t);
-            dkydt = Ry*cos(t);
-            dkzdt = -Rx*(kxd/kzd)*sin(t);
+% Compute intersection radii 
+% (perp and par refer to perpendicular and parallel shift direction)
+Rperp = sqrt(k^2 - (ktransd.^2+kzd.^2)/4);
+Rpar = Rperp./sqrt(1 + ktransd.^2./kzd.^2);
 
-            % Break up the integrand a bit
-            HtimesHStar = H(kx+kxd/2,ky+kyd/2).*conj(H(kx-kxd/2,ky-kyd/2));
-            GstarModsqrHi = conj(G(kx-kxd/2,ky+kyd/2)).*abs(Hi(-kx-kxd/2,-ky-kyd/2)).^2;
-            GModsqrHi = G(kx+kxd/2,ky+kyd/2).*abs(Hi(-kx+kxd/2,-ky+kyd/2)).^2;
+% Parameterize kx, ky, kz and derivatives
+kpar = sign(kzd).*Rpar.*cos(t);
+kperp = Rperp.*sin(t);
+theta = atan2(kyd,kxd);
 
-            arcLengthTerm = sqrt(dkxdt.^2 + dkydt.^2 + dkzdt.^2);
+kx = cos(theta).*kpar - sin(theta).*kperp;
+ky = sin(theta).*kpar + cos(theta).*kperp;
 
-            % Integrate
-            phaseTF(kydIdx,kxdIdx,kzdIdx) = sum(HtimesHStar.*(GstarModsqrHi+GModsqrHi).*arcLengthTerm);
-            
-        end % kxd looping
+clear kpar kperp theta
 
-    end % kyd looping
-    
-end % kzd looping
+dkxdt = Rpar.*sin(t);
+dkydt = Rperp.*cos(t);
+dkzdt = -Rpar.*(ktransd./kzd).*sin(t);
+
+clear ktransd Rpar Rperp t kzd
+
+% Break up the integrand a bit
+arcLengthTerm = sqrt(dkxdt.^2 + dkydt.^2 + dkzdt.^2); clear dkxdt dkydt dkzdt
+HtimesHStar = H(kx+kxd/2,ky+kyd/2).*conj(H(kx-kxd/2,ky-kyd/2));
+GstarModsqrHi = conj(G(kx-kxd/2,ky-kyd/2)).*abs(Hi(-kx-kxd/2,-ky-kyd/2)).^2;
+GModsqrHi = G(kx+kxd/2,ky+kyd/2).*abs(Hi(-kx+kxd/2,-ky+kyd/2)).^2;
+
+clear kxd kyd
+
+% Integrate along parameter t (dimension 4)
+integrand = HtimesHStar.*(GstarModsqrHi + GModsqrHi).*arcLengthTerm;
+clear arcLengthTerm HtimesHStar GstarModsqrHi GModsqrHi
+phaseTF = sum(integrand,4);
+
+% Correct where kzd = 0
+phaseTF(kzdCorrection) = 0;
+
 
 
 
