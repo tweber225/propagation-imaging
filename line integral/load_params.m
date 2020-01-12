@@ -14,10 +14,10 @@ p.sphereCenterSpacing = 15; % um
 p.centerRandomOffset = 2;
 p.tiltXY = [.07 .12];        % rad, about x axis and about y axis, resp.
 
-p.illuminationNA = 0.3;
+p.illuminationNA = 0.4;
 p.imagingNA = 0.4;
 
-p.asymmetricIllumination = false;
+p.asymmetricIllumination = true;
 
 
 % Number of points used to approximate line integral for each transfer function point
