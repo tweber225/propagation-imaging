@@ -1,4 +1,4 @@
-function phaseTF = generate_phaseTF(p,kxdRequested,kydRequested,kzdRequested)
+function phaseTF = generate_TF_exact(p,kxdRequested,kydRequested,kzdRequested)
 % Function to generate phase transfer function (TF) for a partially
 % coherent microscope
 
@@ -70,7 +70,7 @@ phaseTF = sum(integrand,4);
 % Pesky DC point: Correction for when kzd = 0 & ktransd -> 0
 % Limit is just a single arc through illumination pupil, but there are many
 % directions that we could approach from for this limit. Do many approaches
-% and average them. Line intergral process is the same with kxd,kyd = 0
+% and average them. Line intergral process is the same but with kxd,kyd = 0
 numApproachAngles = 16;
 approachAngles = linspace(0,2*pi,numApproachAngles+1); approachAngles = approachAngles(1:end-1);
 

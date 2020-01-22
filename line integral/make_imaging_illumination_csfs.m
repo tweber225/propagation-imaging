@@ -28,20 +28,20 @@ illumSquared = illuminationSpatialFrequencyCutoff^2;
 
 
 if strcmp(p.dataType,'single')
-    H = @(kx,ky) single(kx.^2 + ky.^2 < imagingSquared);
+    H = @(kx,ky) single(kx.^2 + ky.^2 <= imagingSquared);
     
     if p.asymmetricIllumination
-        Hi = @(kx,ky) single((kx.^2 + ky.^2 < illumSquared) & kx>=0);
+        Hi = @(kx,ky) single((kx.^2 + ky.^2 <= illumSquared) & kx>=0);
     else
-        Hi = @(kx,ky) single((kx.^2 + ky.^2 < illumSquared));
+        Hi = @(kx,ky) single((kx.^2 + ky.^2 <= illumSquared));
     end
 else
-    H = @(kx,ky) double(kx.^2 + ky.^2 < imagingSquared);
+    H = @(kx,ky) double(kx.^2 + ky.^2 <= imagingSquared);
     
     if p.asymmetricIllumination
-        Hi = @(kx,ky) double((kx.^2 + ky.^2 < illumSquared) & kx>=0);
+        Hi = @(kx,ky) double((kx.^2 + ky.^2 <= illumSquared) & kx>=0);
     else
-        Hi = @(kx,ky) double((kx.^2 + ky.^2 < illumSquared));
+        Hi = @(kx,ky) double((kx.^2 + ky.^2 <= illumSquared));
     end
 end
 
