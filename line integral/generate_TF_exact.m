@@ -62,7 +62,7 @@ GModsqrHi = G(kx+kxd/2,ky+kyd/2).*abs(Hi(-kx+kxd/2,-ky+kyd/2)).^2;
 clear kxd kyd
 
 % Integrate along parameter t (dimension 4)
-integrand = HtimesHStar.*(GstarModsqrHi + GModsqrHi).*arcLengthTerm;
+integrand = HtimesHStar.*(GstarModsqrHi - GModsqrHi).*arcLengthTerm;
 clear arcLengthTerm HtimesHStar GstarModsqrHi GModsqrHi
 phaseTF = sum(integrand,4);
 
@@ -88,7 +88,7 @@ HtimesHStar = H(DCkx,DCky).*conj(H(DCkx,DCky));
 GstarModsqrHi = conj(G(DCkx,DCky)).*abs(Hi(-DCkx,-DCky)).^2;
 GModsqrHi = G(DCkx,DCky).*abs(Hi(-DCkx,-DCky)).^2;
 
-integrand = HtimesHStar.*(GstarModsqrHi + GModsqrHi).*arcLengthTerm;
+integrand = HtimesHStar.*(GstarModsqrHi - GModsqrHi).*arcLengthTerm;
 DCTerm = sum(integrand,'all')/numApproachAngles;
 
 phaseTF(kxdRequested==0,kydRequested==0,kzdRequested==0) = DCTerm;
