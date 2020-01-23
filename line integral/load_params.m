@@ -1,5 +1,5 @@
 % Parameters go into structure "p" which gets passed to functions
-p.dataType = 'double';      % data type in which to compute OTF (single or double)
+p.dataType = 'single';      % data type in which to compute OTF (single or double)
 p.pixelSize = 1/2;          % um per pixel
 p.lightWavelength = 0.85;   % um
 p.objectSize = 64;          % um
@@ -14,10 +14,10 @@ p.sphereCenterSpacing = 15; % um
 p.centerRandomOffset = 2;
 p.tiltXY = [.07 .12];        % rad, about x axis and about y axis, resp.
 
-p.illuminationNA = 0.4;
+p.illuminationNA = 0.3;
 p.imagingNA = 0.4;
 
-p.asymmetricIllumination = false;
+p.asymmetricIllumination = true;
 
 
 % Number of points used to approximate line integral for each transfer function point
