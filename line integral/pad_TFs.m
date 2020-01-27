@@ -1,1 +1,0 @@
-function [ptf,atf] = pad_TFs(ptfIn,atfIn,p)

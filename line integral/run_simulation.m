@@ -16,3 +16,18 @@ object = make_3d_object(p);
 
 % Pad the transfer functions to the right sizes
 [ptf,atf] = pad_TFs(ptf,atf,p);
+
+%imagesc(sum(ptf,3));axis equal
+plot(sum(ptf(129,:,:),3))
+
+%% Filter object
+objSpecFilt = fftn(object).*ifftshift(ptf);
+objFiltered = ifftn(objSpecFilt);
+
+
+% Add noise
+img = objFiltered + randn(size(objFiltered)).*1i*p.noiseLevel;
+
+% Show object
+toShow = thru_focus_axial_slice(imag(img),40,-30:5:30);
+imshow(toShow)
