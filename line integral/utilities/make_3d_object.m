@@ -1,4 +1,4 @@
-function object = make_complex_object(p)
+function object = make_3d_object(p)
 
 % Initialize a 3D array for the object to fill
 arraySize = p.objectSize/p.pixelSize;
