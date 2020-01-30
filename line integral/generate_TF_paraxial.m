@@ -48,7 +48,7 @@ mu_yPrime = sinTheta.*mu_par + cosTheta.*mu_perp; clear sinTheta cosTheta mu_par
 % part 1: tildep(muPrime + 1/2 mu) tildep*(muPrime - 1/2 mu)
 % part 2A (for absorption): tildeS(muPrime + 1/2 mu) + tildeS(muPrime - 1/2 mu)
 % part 2A (for phase): tildeS(muPrime + 1/2 mu) - tildeS(muPrime - 1/2 mu)
-part0 = 4*pi*muAbs;
+part0 = muAbs;
 part1 = tildep(mu_xPrime+0.5*mu_x,mu_yPrime+0.5*mu_y).*conj(tildep(mu_xPrime-0.5*mu_x,mu_yPrime-0.5*mu_y));
 S1 = tildeS(mu_xPrime+0.5*mu_x,mu_yPrime+0.5*mu_y);
 S2 = tildeS(mu_xPrime-0.5*mu_x,mu_yPrime-0.5*mu_y); clear mu_xPrime mu_yPrime
