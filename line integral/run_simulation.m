@@ -23,13 +23,20 @@ addpath('utilities')
 % Make 3d object
 object = make_3d_object(p);
 
-objSpecFilt = fftn(object).*ifftshift(ptf);
-objFiltered = ifftn(objSpecFilt);
-
+% Filter with phase and absorption TFs
+objSpecFiltPhase = fftn(object).*ifftshift(ptf);
+objFilteredPhase = real(1i*ifftn(objSpecFiltPhase));
+objSpecFiltAbsorption = fftn(object).*ifftshift(atf);
+objFilteredAbsorption = real(ifftn(objSpecFiltAbsorption));
 
 % Add noise
-img = objFiltered + randn(size(objFiltered)).*1i*p.noiseLevel;
+imgPhase = objFilteredPhase + randn(size(objFilteredPhase)).*p.noiseLevel;
+imgAbsorption = objFilteredAbsorption + randn(size(objFilteredAbsorption)).*p.noiseLevel;
 
 % Show object
-toShow = thru_focus_axial_slice(imag(img),30,-24:6:24);
-imshow(toShow)
+toShowPhase = thru_focus_axial_slice(imgPhase,20,-20:4:20);
+toShowAbsorption = thru_focus_axial_slice(imgAbsorption,20,-20:4:20);
+subplot(2,1,1)
+imshow(toShowPhase)
+subplot(2,1,2)
+imshow(toShowAbsorption)
