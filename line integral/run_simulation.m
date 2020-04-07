@@ -12,11 +12,13 @@ addpath('utilities')
 [mu_x,mu_y,eta] = set_spatial_freq_range(p);
 
 % Generate transfer functions
-[ptf,atf] = generate_TF_exact(p,mu_x,mu_y,eta);
+[ptf,atf] = generate_TF_paraxial(p,mu_x,mu_y,eta);
 
 % Pad the transfer functions to the right sizes
 [ptf,atf] = pad_TFs(ptf,atf,p);
 
+% Set NaNs to 0
+ptf(isnan(ptf)) = 0;
 
 %% Filter object
 
@@ -33,10 +35,13 @@ objFilteredAbsorption = real(ifftn(objSpecFiltAbsorption));
 imgPhase = objFilteredPhase + randn(size(objFilteredPhase)).*p.noiseLevel;
 imgAbsorption = objFilteredAbsorption + randn(size(objFilteredAbsorption)).*p.noiseLevel;
 
-% Show object
-toShowPhase = thru_focus_axial_slice(imgPhase,20,-20:4:20);
-toShowAbsorption = thru_focus_axial_slice(imgAbsorption,20,-20:4:20);
-subplot(2,1,1)
-imshow(toShowPhase)
-subplot(2,1,2)
-imshow(toShowAbsorption)
+%% Show object phase image
+crop = 24;
+toShowPhase = thru_focus_axial_slice(imgPhase,crop,-30:6:30);
+
+imshow(toShowPhase(:,1:(end-2*crop)))
+figure
+imshow(toShowPhase(:,(end-2*crop+1):end))
+
+
+
