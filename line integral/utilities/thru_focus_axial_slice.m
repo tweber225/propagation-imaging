@@ -1,13 +1,10 @@
-function toShow = throughFocusAndAxialSlice(filtObj,crop,slices)
+function toShow = thru_focus_axial_slice(filtObj,crop,frameThruFocusStartEnd,frameThruFocusdz)
 
-%dZ = size(filtObj,3)/(numSlices-1);
-%slices = (-(numSlices-1)/2*dZ):dZ:(numSlices-1)/2*dZ;
-
-% Gather the slices
+% Gather selected slices
+slices = -frameThruFocusStartEnd:frameThruFocusdz:frameThruFocusStartEnd;
 toShow = [];
 for sIdx = slices
     toShow = [toShow, filtObj((floor(end/2)+1-crop):(floor(end/2)+1+crop),(floor(end/2)+1-crop):(floor(end/2)+1+crop),floor(end/2)+1 + sIdx)];
-    
 end
 
 % Append axial section

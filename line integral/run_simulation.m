@@ -1,47 +1,54 @@
+%% RUN_SIMULATION
+% Main script to call a series of functions which simulate 3D imaging of a
+% weak absorption or phase object with a widefield transmission microscope.
+% Degree of coherence is adjustable.
+% 
+% Timothy Weber
+% Biomicroscopy Lab, BU
+% April 2020
 
-% Load the parameters for the simulation
+
+%% Set up: load the parameters, add subfolders to path
+% Open "load_params" file to review all settings
 load_params
-
-% Add subfolder to make all the utility files visible
 addpath('utilities')
 
 
-
 %% Generate OTF
-% Determine spatial frequency range
+% Determine spatial frequency range (variables correspond to Streibl's)
 [mu_x,mu_y,eta] = set_spatial_freq_range(p);
 
 % Generate transfer functions
 [ptf,atf] = generate_TF_paraxial(p,mu_x,mu_y,eta);
 
-% Pad the transfer functions to the right sizes
+% Pad the transfer functions to correct size
 [ptf,atf] = pad_TFs(ptf,atf,p);
 
-% Set NaNs to 0
-ptf(isnan(ptf)) = 0;
 
 %% Filter object
-
-% Make 3d object
 object = make_3d_object(p);
 
 % Filter with phase and absorption TFs
-objSpecFiltPhase = fftn(object).*ifftshift(ptf);
+objectSpectrum = fftn(object);
+objSpecFiltPhase = objectSpectrum.*ifftshift(ptf);
 objFilteredPhase = real(1i*ifftn(objSpecFiltPhase));
-objSpecFiltAbsorption = fftn(object).*ifftshift(atf);
+objSpecFiltAbsorption = objectSpectrum.*ifftshift(atf);
 objFilteredAbsorption = real(ifftn(objSpecFiltAbsorption));
 
 % Add noise
 imgPhase = objFilteredPhase + randn(size(objFilteredPhase)).*p.noiseLevel;
 imgAbsorption = objFilteredAbsorption + randn(size(objFilteredAbsorption)).*p.noiseLevel;
 
-%% Show object phase image
-crop = 24;
-toShowPhase = thru_focus_axial_slice(imgPhase,crop,-30:6:30);
 
-imshow(toShowPhase(:,1:(end-2*crop)))
-figure
-imshow(toShowPhase(:,(end-2*crop+1):end))
+%% Show simulated images
+% Make composite through focus (axial sweep) images for display
+compositeImgPhase = thru_focus_axial_slice(imgPhase,p.crop,p.frameThruFocusStartEnd,p.frameThruFocusdz);
+compositeImgAbsorption = thru_focus_axial_slice(-imgAbsorption,p.crop,p.frameThruFocusStartEnd,p.frameThruFocusdz);
 
-
+subplot(2,1,1)
+imshow(compositeImgPhase)
+title(['Phase: ' label_maker(p)])
+subplot(2,1,2)
+imshow(compositeImgAbsorption)
+title(['Absorption: ' label_maker(p)])
 

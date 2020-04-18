@@ -1,31 +1,31 @@
 function [phaseTF,absorptionTF] = generate_TF_paraxial(p,mu_x,mu_y,eta)
+% GENERATE_TF_PARAXIAL
 % Function to generate phase and absorption transfer functions (TFs) for a
 % partially coherent microscope under paraxial approximation.
 %
-% Variable names roughly match Streibl's notation.
+% Variable names roughly match Streibl's notation, that is
 % mu_x/y are transverse spatial frequencies
 % eta is longitudinal spatial frequency
 
-% Extract some parameters from p structure
-imagingNA = p.imagingNA;
-lambda = p.lightWavelength;     % um
-
-% Ensure 1D vectors in the right dimensions; convert to requested data type
+% Make sure 1D vectors are in correct dims: mu_x occupies 1st dimension,
+% mu_y dim 2, eta dim 3, and t (which will be integration variable) dim 4 
 mu_x = mu_x(:)';
 mu_y = mu_y(:);
 eta = reshape(eta(:),[1 1 numel(eta)]);
+
+% convert to requested data type
 if strcmp(p.dataType,'single') 
     mu_x = single(mu_x);
     mu_y = single(mu_y);
     eta = single(eta);
-    imagingNA = single(imagingNA);
-    lambda = single(lambda);
+    p.imagingNA = single(p.imagingNA);
+    p.lightWavelength = single(p.lightWavelength);
 end
 
-% Autocalculated parameters
-muLim = imagingNA*lambda^-1;      % um^-1, defines int limits of line integral
+% Autocalculated parameter: defines int limits of line integral [um^-1]
+muLim = p.imagingNA*p.lightWavelength^-1;
 
-% Make the CSFs: tilde{p} and tilde{S}
+% Make the amplitude/coherent transfer functions CSFs: tilde{p} & tilde{S}
 [tildep,tildeS] = make_imaging_illumination_csfs(p);
 
 % Make line integral parameter, t
@@ -35,8 +35,8 @@ t = reshape(linspace(-muLim,muLim,p.numLineIntPoints),[1 1 1 p.numLineIntPoints]
 muAbs = sqrt(mu_x.^2 + mu_y.^2);
 
 % Parameterize the primed variables (mu_x' and mu_y') by first forming a
-% line as if mu_y=0 and mu_x,eta~=0, then rotate into place
-mu_par = -eta./(lambda.*muAbs);
+% line as if mu_y=0 and mu_x,eta=/=0, then rotate into place
+mu_par = -eta./(p.lightWavelength.*muAbs);
 mu_perp = t;
 theta = atan2(mu_y,mu_x);
 cosTheta = cos(theta); sinTheta = sin(theta); clear theta
@@ -63,4 +63,6 @@ absorptionTF = sum(part1.*part2A,4)./part0; clear part2A part1
 phaseTF(floor(end/2)+1,floor(end/2)+1,:) = 0;
 absorptionTF(floor(end/2)+1,floor(end/2)+1,:) = 0;
 
-
+% Set any NaNs to 0
+phaseTF(isnan(phaseTF)) = 0;
+absorptionTF(isnan(absorptionTF)) = 0;
