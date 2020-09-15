@@ -1,5 +1,5 @@
 % Parameters
-p.NA = 0.5;         % dimensionless
+p.NA = 0.2;         % dimensionless
 p.wl = 0.561;       % microns
 p.sampDens = 0.1;   % microns
 p.numPoints = 256;  % number
