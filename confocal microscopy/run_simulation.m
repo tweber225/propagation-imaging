@@ -10,3 +10,4 @@ PSF = generate_PSF(p,d);
 % View XZ projection
 imagesc(squeeze(sum(PSF,2))')
 axis equal tight
+colormap gray

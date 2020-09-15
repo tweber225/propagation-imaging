@@ -14,6 +14,9 @@ d.sfIdx = -d.maxSf:d.dSf:(d.maxSf-d.dSf);
 d.posX = x;
 d.posY = y;
 
+% generate pinhole image
+d.pinhole = (d.posX.^2 + d.posY.^2) <= p.pinholeDiam^2;
+
 % generate spatial frequency domain
 [sfX,sfY] = meshgrid(d.sfIdx);
 d.sfLatSqr = sfX.^2 + sfY.^2;
