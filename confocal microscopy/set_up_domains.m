@@ -16,15 +16,16 @@ d.posY = y;
 
 % generate pinhole image
 d.pinhole = (d.posX.^2 + d.posY.^2) <= (p.pinholeDiam/2)^2;
+d.pinObstruction = ~d.pinhole;
 
 % generate spatial frequency domain
 [sfX,sfY] = meshgrid(d.sfIdx);
 d.sfLatSqr = sfX.^2 + sfY.^2;
 
-% generate limiting circular coherence transfer function (CTF) for
-% detection
+% generate limiting circular coherence transfer functions (CTF)
 d.CTFd = single(d.sfLatSqr <= (p.sfCutd^2));
+d.CTFi = single(d.sfLatSqr <= (p.sfCuti^2));
 
 % Limit the lateral spatial frequency squared by the CSF, so it doesn't
 % overflow at very high values
-d.sfLatSqr = d.sfLatSqr.*d.CTFd;
+%d.sfLatSqr = d.sfLatSqr.*d.CTFd;
