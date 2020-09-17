@@ -1,9 +1,11 @@
 function PSF = generate_PSF(p,d)
 
-% Add defocus phase to CTFs
-CTFi_3D = d.CTFi.*exp((2i*pi*p.z/1000).*sqrt(p.ki^2 - d.sfLatSqr.*d.CTFi));
-CTFd_3D = d.CTFd.*exp((2i*pi*(p.z)/1000).*sqrt(p.kd^2 - d.sfLatSqr.*d.CTFd));
+% Add defocus phase to detection and illumination CTFs
+CTFd_3D = d.CTFd.*exp((2i*pi*(p.z-p.zOffsetd)/1000).*sqrt(p.kd^2 - d.sfLatSqr));
+CTFi_3D = d.CTFd.*exp((2i*pi*(p.z-p.zOffseti)/1000).*sqrt(p.kd^2 - d.sfLatSqr));
 
+% Additionally apply Gaussian envelop to illumination CTF
+CTFi_3D = CTFi_3D.*exp(-4*log(2)*d.sfLatSqr/(p.waistiFWHM^2));
 
 % Fourier Transform CTF to CSF
 CTFi_3D = ifftshift(ifftshift(CTFi_3D,1),2);
@@ -17,3 +19,4 @@ pinholeImg = convn(diffLimPSFd,d.pinhole,'same');
 
 % Compute point spread function (PSF)
 PSF = (CSFi.*conj(CSFi)).*pinholeImg;
+%PSF = pinholeImg;
