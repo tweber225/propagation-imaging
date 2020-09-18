@@ -1,7 +1,7 @@
 % Parameters
 p.sampDens = 0.1;   % microns
-p.numPoints = 256;  % number
-p.zRange = 30;      % microns, plus or minus from in-focus
+p.numPoints = 128;  % number
+p.zRange = 15;      % microns, plus or minus from in-focus
 p.n = 1.333;        % refractive index of object medium
 
 

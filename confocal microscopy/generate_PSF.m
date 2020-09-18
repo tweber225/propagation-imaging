@@ -1,20 +1,23 @@
 function PSF = generate_PSF(p,d)
 
-% If an upstream pinhole is present
-if p.upPin 
-    % Propagate flat spectrum (ie point) to obstructing pinhole
-    CTFd_3D = exp((2i*pi*p.upPinOffset/1000).*sqrt(p.kd^2 - d.sfLatSqr));
-    
-    % FT the obstruction pinhole
-    FTobstruction = fftshift(fft2(ifftshift(d.pinObstruction)));
-    
-    % Convolve
-    thing = conv2(CTFd_3D,FTobstruction,'same');
-end
-
-% Add defocus phase to detection and illumination CTFs
+% Propagate flat spectrum (ie a point) of various out of focus planes to focal plane
 CTFd_3D = d.CTFd.*exp((2i*pi*(p.z-p.zOffsetd)/1000).*sqrt(p.kd^2 - d.sfLatSqr));
 CTFi_3D = d.CTFi.*exp((2i*pi*(p.z-p.zOffseti)/1000).*sqrt(p.kd^2 - d.sfLatSqr));
+
+% If an upstream pinhole is present
+if p.upPin 
+    % Propagate spectrum to obstructing pinhole
+    CTFd_3D = CTFd_3D.*(exp((2i*pi*p.upPinOffset/1000).*sqrt(p.kd^2 - d.sfLatSqr)));
+    
+    % FT the obstructing pinhole
+    FTobstruction = fftshift(fft2(ifftshift(d.pinObstruction)));
+    
+    % Convolve with transform of obstruction and reverse propagate back to focal plane
+    thing = convn(CTFd_3D,FTobstruction,'same');
+    thing2 = thing.*conj(exp((2i*pi*p.upPinOffset/1000).*sqrt(p.kd^2 - d.sfLatSqr)));
+end
+
+
 
 % Additionally apply Gaussian envelop to illumination CTF
 CTFi_3D = CTFi_3D.*exp(-4*log(2)*d.sfLatSqr/(p.waistiFWHM^2));
