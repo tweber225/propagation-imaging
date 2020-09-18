@@ -23,9 +23,6 @@ d.pinObstruction = ~d.pinhole;
 d.sfLatSqr = sfX.^2 + sfY.^2;
 
 % generate limiting circular coherence transfer functions (CTF)
-d.CTFd = single(d.sfLatSqr <= (p.sfCutd^2));
-d.CTFi = single(d.sfLatSqr <= (p.sfCuti^2));
+d.CTFd = d.sfLatSqr <= (p.sfCutd^2);
+d.CTFi = d.sfLatSqr <= (p.sfCuti^2);
 
-% Limit the lateral spatial frequency squared by the CSF, so it doesn't
-% overflow at very high values
-%d.sfLatSqr = d.sfLatSqr.*d.CTFd;
