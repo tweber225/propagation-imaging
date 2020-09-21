@@ -9,14 +9,14 @@ p.n = 1.333;        % refractive index of object medium
 p.NAi = 0.95;           % limiting aperture for illumination
 p.wli = 0.561;          % microns
 p.zOffseti = 0;         % microns axial displacement
-p.waisti = .2;          % fraction of limiting aperture, inf to make beam flat-top
+p.waisti = 1;          % fraction of limiting aperture, inf to make beam flat-top
 
 % Detection
 p.NAd = 0.95;            % dimensionless
 p.wld = 0.610;          % microns
 p.pinholeDiam = 1.31;   % microns in sample, don't do exactly 0 for small pinhole
 p.zOffsetd = 0;         % microns axial displacement
-p.upPin = true;
+p.upPin = false;
 p.upPinOffset = 5.97;    % microns
 
 
