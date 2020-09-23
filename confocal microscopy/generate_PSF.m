@@ -22,7 +22,12 @@ PSFi = CSFi.*conj(CSFi);
 % If an upstream pinhole is present
 if p.upPin
     % Expand 4th dim for index of positions inside the pinhole
-    [pinY,pinX] = find(d.pinhole); 
+    if p.noPinhole
+        % use image of detector instead
+        [pinY,pinX] = find(d.detector);
+    else
+        [pinY,pinX] = find(d.pinhole);
+    end
     pinY = single(pinY) - p.numPoints/2 - 1;
     pinX = single(pinX) - p.numPoints/2 - 1;
     pinY = permute(pinY,[4 3 2 1]);
@@ -54,6 +59,7 @@ CTFd_3D = CTFd_3D.*propagator(p.z-p.zOffsetd,p.kd,d.sfLatSqr);
 % Fourier Transform CTFs to CSFs
 CTFd_3D = ifftshift(ifftshift(CTFd_3D,1),2);
 CSFd = fftshift(fftshift(ifft2(CTFd_3D),1),2);
+clear CTFd_3D % to clear out some space
 
 % Compute diffraction-limited detection PSFs 
 % (as function of pinhole position, if applicable)

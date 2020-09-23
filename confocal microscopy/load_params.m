@@ -1,7 +1,7 @@
 % Parameters
 p.sampDens = 0.1;   % microns
-p.numPoints = 128;  % number
-p.zRange = 18;      % microns, plus or minus from in-focus
+p.numPoints = 64;  % number
+p.zRange = 10;      % microns, plus or minus from in-focus
 p.n = 1.333;        % refractive index of object medium
 
 
@@ -18,6 +18,8 @@ p.pinholeDiam = 1.31;   % microns in sample, don't do exactly 0 for small pinhol
 p.zOffsetd = 5.97;         % microns axial displacement
 p.upPin = true;
 p.upPinOffset = 5.97;    % microns
+p.noPinhole = true;
+p.detectorSize = 2.641;  % microns in sample
 
 
 % Calculated

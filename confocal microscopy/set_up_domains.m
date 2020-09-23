@@ -14,7 +14,8 @@ d.sfIdx = -d.maxSf:d.dSf:(d.maxSf-d.dSf);
 d.posX = x;
 d.posY = y;
 
-% generate pinhole image
+% generate pinhole image, or detector outline
+d.detector = (abs(d.posY) < (p.detectorSize/2)) & (abs(d.posX) < (p.detectorSize/2));
 d.pinhole = (d.posX.^2 + d.posY.^2) <= (p.pinholeDiam/2)^2;
 d.pinObstruction = ~d.pinhole;
 
