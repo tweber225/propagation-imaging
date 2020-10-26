@@ -7,7 +7,7 @@ p.numLatPix = 256;       % number pixels per lateral dimension
 p.n = 1;                % refractive index of object medium
 p.NA = 0.4;            % dimensionless
 p.wl = 0.850;          % microns
-p.focalPlanes = -40:5:40;
+p.focalPlanes = -35:5:35;
 
 % Calculated
 p.k = single(p.n/p.wl);  
@@ -21,9 +21,9 @@ zIdx = permute(d.positionIdx,[3 1 2]); % make z index along 3rd dimension
 % Create objects
 [x,y,z] = meshgrid(d.positionIdx);
 r = 2.5;
-x2 = 7.2;
-y2 = 1;
-z2 = 21.5;
+x2 = 0;
+y2 = 2;
+z2 = -25;
 object1 = single(x.^2 + y.^2 + z.^2 < r^2);
 object2 = single((x-x2).^2 + (y-y2).^2 + (z-z2).^2 < r^2);
 objectSpectrum1 = fftshift(fftshift(fft2(object1),1),2);
@@ -51,6 +51,12 @@ F2 = fftn(imgIntensity2);
 XPowSpectrum = F1.*conj(F2);
 XPowSpectrumNormalized = XPowSpectrum./abs(XPowSpectrum+eps);
 
-volumeViewer(fftshift(angle(XPowSpectrum)))
+XC = real(ifftn(XPowSpectrumNormalized));
+volumeViewer(XC)
+
+
+[M,I] = max(XC,[],'all','linear');
+[ym,xm,zm] = ind2sub(size(XC),I)
+
 
 
