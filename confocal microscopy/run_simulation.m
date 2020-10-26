@@ -15,6 +15,6 @@ plot(d.positionIdx,lineProfi,d.positionIdx,lineProfd);
 
 % View XZ projection
 figure;
-imagesc(squeeze(sum(PSF,2))')
+imagesc(squeeze(sum(PSFd,2))')
 axis equal tight
 colormap gray
