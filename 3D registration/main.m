@@ -7,7 +7,7 @@ p.numLatPix = 256;       % number pixels per lateral dimension
 p.n = 1;                % refractive index of object medium
 p.NA = 0.4;            % dimensionless
 p.wl = 0.850;          % microns
-p.focalPlanes = -40:5:40;
+p.focalPlanes = -40:5:40;   %microns
 
 % Calculated
 p.k = single(p.n/p.wl);  
