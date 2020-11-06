@@ -3,8 +3,8 @@ function out = OTFp(p,d)
 % Compute a few factors
 H_det = H(d.sfX,d.sfY,p.sfCutoff);
 H_illum = abs(H(-d.sfX,-d.sfY,p.sfCutoffi)).^2;
-G1 = G(p.k,d.sfX,d.sfY,-d.posZ);
-D1 = D(p.k,d.sfX,d.sfY,d.posZ);
+G1 = G(d.sfX,d.sfY,p.k,-d.posZ);
+D1 = D(d.sfX,d.sfY,p.k,d.posZ);
 
 % Convolve effective partially coherent transmission CSFs in the frequency domain
 p1 = H_det.*G1.*H_illum;

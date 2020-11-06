@@ -1,4 +1,4 @@
-function out = G(k,sfX,sfY,z)
+function out = G(sfX,sfY,k,z)
 % z should be vector along third dimension
 
 thisKz = k_z(k,sfX,sfY);
