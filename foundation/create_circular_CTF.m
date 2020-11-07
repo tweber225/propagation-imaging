@@ -11,10 +11,3 @@ CTF = single(sfLateralSquared < sfCutoff.^2);
 % Add defocus phase
 CTF = CTF.*D(sfX,sfY,k,z);
 
-
-
-% OLD
-%CTF = CTF.*exp(2i*pi*abs(z).*sqrt(k^2 - sfLateralSquared));
-
-% Correct negative z defocus
-%CTF(:,:,z<0) = conj(CTF(:,:,z<0));
