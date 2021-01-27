@@ -1,6 +1,7 @@
 % User Input Parameters
-p.overSampling = 4;
-p.realPixSize = 0.835/p.overSampling;    % microns
+p.overSampling = 8;
+p.realPixSize = 1.151;  % True size of microscope pixels.
+p.simulationPixSize = p.realPixSize/p.overSampling;    % microns
 p.numLatPix = 64*p.overSampling;       % number pixels per lateral dimension
 p.zSpacing = p.realPixSize;
 p.numZPix = 256;
