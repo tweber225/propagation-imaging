@@ -1,6 +1,6 @@
-function out = k_z(k,sfX,sfY)
+function out = k_z(k,sfIdx)
 
-sqrtArg = k^2 - sfX.^2 - sfY.^2;
+sqrtArg = k^2 - sfIdx.^2 - (sfIdx').^2; % implicitly expand
 
 % disallow imaginary kz
 sqrtArg(sqrtArg<0) = 0;

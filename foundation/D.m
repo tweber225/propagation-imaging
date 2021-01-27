@@ -1,8 +1,9 @@
-function out = D(sfX,sfY,k,z)
+function out = D(sfIdx,k,z)
 % z should be vector along third dimension
 
-thisKz = k_z(k,sfX,sfY);
+thisKz = k_z(k,sfIdx);
 
-expArg = 2i*pi*z.*thisKz;
+z3 = permute(z,[3 1 2]);
+expArg = 2i*pi*z3.*thisKz; % implicitly expand into 3rd dimension
 
 out = exp(expArg);
