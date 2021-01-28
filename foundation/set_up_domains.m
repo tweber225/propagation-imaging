@@ -14,7 +14,7 @@ d.maxZPosition = single((p.numZPix/2 - 1)*p.simulationPixSize);
 d.minZPosition = single(-(p.numZPix/2)*p.simulationPixSize);
 d.ZPosIdx = single(d.minZPosition:p.simulationPixSize:d.maxZPosition);
 
-d.maxSf = single(1/(2*p.realPixSize));     % inverse um
+d.maxSf = single(1/(2*p.simulationPixSize));     % inverse um
 d.dSf = single(2*d.maxSf/p.numLatPix);
 d.sfIdx = -d.maxSf:d.dSf:(d.maxSf-d.dSf);
 
