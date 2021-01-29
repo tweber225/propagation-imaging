@@ -1,7 +1,6 @@
-function out = H(sfX,sfY,cutoff)
-% z should be vector along third dimension
+function out = H(sfIdx,cutoff)
 
-sfLateralSquared = sfX.^2 + sfY.^2;
+sfLateralSquared = sfIdx.^2 + (sfIdx').^2; % implicit expansion into 2 dims
 
 % Compute diffraction-limited CTF
 out = single(sfLateralSquared < cutoff.^2);

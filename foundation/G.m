@@ -1,9 +1,9 @@
-function out = G(sfX,sfY,k,z)
-% z should be vector along third dimension
+function out = G(sfIdx,k,z)
 
-thisKz = k_z(k,sfX,sfY);
+thisKz = k_z(k,sfIdx);
+z3 = permute(z,[3 1 2]); % z axis should occupy 3rd dimension
 
-expArg = 2i*pi*z.*thisKz;
+expArg = 2i*pi*z3.*thisKz;
 
 denom = 4i*pi*thisKz;
 
