@@ -11,8 +11,10 @@ p.focalPlanes = -20:5:20;   %microns
 
 % Object Parameters
 p.r = 1.51;
-p.nd = 0.1;
-p.centerPos = [.1, .234, 0];
+p.dn = 0.05;
+p.centerStartPos = [.1, .234, 0];
+p.numTimePoints = 128; % absolute time doesn't really matter
+p.objVelocity = [.001,.03,.1];
 
 % Calculated Parameters
 p.numFocalPlanes = numel(p.focalPlanes);

@@ -5,8 +5,7 @@ load_parameters
 d = set_up_domains(p);
 
 % Create object
-centerPos = [p.x0,p.y0,p.z0];
-object = create_spherical_object(p,d,centerPos);
+object = create_spherical_object(d.posIdx,d.zPosIdx,p.centerPos,p.r,p.nd);
 
 % Create 3D asymmetric phase OTF
 OTF = OTFp(p,d,'asym');
