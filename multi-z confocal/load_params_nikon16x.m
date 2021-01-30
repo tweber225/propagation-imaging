@@ -1,9 +1,9 @@
 % User Input Parameters
-p.overSampling = 10;
+p.overSampling = 5;
 p.realPixSize = 1.15;  % True size of microscope pixels.
 p.simulationPixSize = p.realPixSize/p.overSampling;    % microns
-p.numLatPix = 14*p.overSampling;       % number pixels per lateral dimension
-p.numZPix = 500;
+p.numLatPix = 10*p.overSampling;       % number pixels per lateral dimension
+p.numZPix = 400;
 p.n = 1.332;                % refractive index of object medium
 p.NA_em = .8;            % dimensionless
 p.NA_ex = 0.2;
