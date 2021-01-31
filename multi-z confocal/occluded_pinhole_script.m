@@ -26,7 +26,7 @@ pinholePropBack = pinholeBlocked.*D(d.sfIdx,p.k_em,-p.pinholeSeparation);
 % Use 3D CTF
 CTF = create_circular_CTF(d.sfIdx,p.sfCutoff_em,p.k_em,d.zPosIdx);
 detect3D = ifft2(ifftshift2(pinholePropBack.*CTF));
-detectPSF = sum(detect3D.*conj(detect3D),4); % Integrate all the pinhole spots incoherently
+detectPSF = sum(detect3D.*conj(detect3D),4); % Integrate all the pinhole spots (incoherently)
 
 
 fullPSF = illumPSF.*detectPSF;
