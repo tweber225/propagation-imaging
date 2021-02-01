@@ -1,17 +1,17 @@
 % User Input Parameters
-p.overSampling = 5;
+p.overSampling = 4;
 p.realPixSize = 1.15;  % True size of microscope pixels.
 p.simulationPixSize = p.realPixSize/p.overSampling;    % microns
-p.numLatPix = 10*p.overSampling;       % number pixels per lateral dimension
-p.numZPix = 400;
+p.numLatPix = 30*p.overSampling;       % number pixels per lateral dimension
+p.numZPix = 200;
 p.n = 1.332;                % refractive index of object medium
 p.NA_em = .8;            % dimensionless
-p.NA_ex = 0.2;
+p.NA_ex = 0.1;
 p.excitationBeamGaussianFWHM = 1000; % enter high number for plane wave.
 p.wl_ex = 0.561;        % excitation wavelength
 p.wl_em = 0.610;        % emission (center) wavelength
 
-p.pinholeDiam = 1.8;  % microns
+p.pinholeDiam = 2*1.8;  % microns
 p.numPinholes = 4;
 p.pinholeSeparation = 11.52;
 p.firstPinholeDepth = -11.52;
