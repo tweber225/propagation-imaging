@@ -1,4 +1,7 @@
-function pinholeSpots = make_quadrant_pinhole_spots(pinholeFunc,posIdx)
+function pinholeSpots = make_quadrant_pinhole_spots(pinholeFunc)
+
+posIdx = 1:size(pinholeFunc,1);
+posIdx = posIdx - size(pinholeFunc,1)/2 - 1/2;
 
 % Select only the upper right quadrant
 pinholeFunc(:,posIdx<=0) = 0;

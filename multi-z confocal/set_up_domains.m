@@ -10,8 +10,7 @@ d.maxZPosition = single((p.numZPix/2 - 1)*p.simulationPixSize);
 d.minZPosition = single(-(p.numZPix/2)*p.simulationPixSize);
 d.zPosIdx = single(d.minZPosition:p.simulationPixSize:d.maxZPosition);
 
-channelOffsetVector = p.firstPinholeDepth:p.pinholeSeparation:(p.pinholeSeparation*(p.numPinholes-1) + p.firstPinholeDepth);
-d.emZPosIdx = d.zPosIdx + channelOffsetVector'; % implicitly expand
+d.emZPosIdx = d.zPosIdx + p.pinholeLocations'; % implicitly expand
 
 d.maxSf = single(1/(2*p.simulationPixSize));     % inverse um
 d.dSf = single(2*d.maxSf/p.numLatPix);
