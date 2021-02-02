@@ -1,18 +1,16 @@
-function imgIntensity = intensity_imaging(object,pixSize,OTF,numFocalPlanes,planeLocations)
+function imgIntensity = intensity_imaging(object,pixSize,OTF,focalPlaneLocations,noiseLevel)
 
-
-% Check that object and OTF have same dimensions
-if sum(size(object) ~= size(OTF))
-    error('Object and OTF must be same size in all 3 dimensions')
-end
+numFocalPlanes = numel(focalPlaneLocations);
 
 % 2D Fourier transform object
 objSpec= fft2(object);
 
+% Allocate some space for the imaged spectra
+imgIntensitySpectrumStack = complex(zeros(size(object,1),size(object,2),numFocalPlanes,size(object,4),'single'));
+
 % Create each focal plane intensity image
-imgIntensitySpectrumStack = complex(zeros(size(OTF,1),size(OTF,2),numFocalPlanes,'single'));
 for focalPlaneIdx = 1:numFocalPlanes
-    focalPlaneOffset = planeLocations(focalPlaneIdx);
+    focalPlaneOffset = focalPlaneLocations(focalPlaneIdx);
     zPixelShift = focalPlaneOffset./pixSize;
     
     % Move object in Z
@@ -20,10 +18,14 @@ for focalPlaneIdx = 1:numFocalPlanes
     
     % Multiply shifted object spectrum by depth-dependent OTF, and
     % integrate along z
-    imgIntensitySpectrumStack(:,:,focalPlaneIdx) = sum(shiftedObjectSpectrum.*OTF,3);
+    imgIntensitySpectrumStack(:,:,focalPlaneIdx,:) = sum(shiftedObjectSpectrum.*OTF,3);
     
 end
 
-
 % Compute images from spectra
-imgIntensity = real(fft2(imgIntensitySpectrumStack));
+imgIntensity = imag(fft2(imgIntensitySpectrumStack));
+
+% Add some Gaussian noise
+signalRange = max(imgIntensity(:)) - min(imgIntensity(:));
+imgIntensity = imgIntensity + randn(size(imgIntensity))*signalRange*noiseLevel;
+

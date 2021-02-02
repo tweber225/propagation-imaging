@@ -11,7 +11,7 @@ object = create_spherical_object(d.posIdx,d.zPosIdx,p.centerPos,p.r,p.nd);
 OTF = OTFp(p,d,'asym');
 
 % Perform imaging
-imgs = intensity_imaging(object,p.zPixSize,OTF,p.numFocalPlanes,p.focalPlanes);
+imgs = intensity_imaging(object,p.zPixSize,OTF,p.focalPlanes);
 
 
 
