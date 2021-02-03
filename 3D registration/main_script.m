@@ -12,35 +12,48 @@ d = set_up_domains(p);
 
 
 %% Generate 3D Images
-% Create the object
+% Create the object 
 movingObject = create_spherical_moving_object(d.posIdx,d.zPosIdx,p.obj);
 
-% Smooth the object a tad
-movingObject = convn(movingObject,ones(3,3,3),'same');
-
 % Create 3D asymmetric phase OTF
-OTF = OTFp(p,d,'asym');
+OTF = OTFp(p.sfCutoff,p.sfCutoffi,p.k,d.zPosIdx,d.sfIdx,'asym');
 
 % Perform 3D imaging + noise
 imgs = intensity_imaging(movingObject,p.zPixSize,OTF,p.focalPlanes,p.noiseLevel);
 
+% Crop laterally
+imgs = crop_images(imgs,p.cropFraction);
+
 
 
 %% Attempt to 3D register
-spectra = fft3(imgs,[size(imgs,1) size(imgs,1) size(imgs,1)]);
+
+% Compute 3D Fourier Transform of each image stack
+spectra = fft3(imgs);
+
+% Generate filtering function from the phase OTF
+cropSfIdx = d.sfIdx(1:1/p.cropFraction:end);
+OTF3DFilter = generate_3D_OTF_filter(p.sfCutoff,p.sfCutoffi,p.k,p.focalPlanes,cropSfIdx,p.filterThreshold);
+
 
 % Cross correlate first stack with each subsequent
 for tIdx = 2:size(imgs,4)
+    % Perform frequency-domain cross correlation and upsample
     xPowSpec = spectra(:,:,:,1).*conj(spectra(:,:,:,tIdx));
-    xCorr = fftshift3(real(ifft2(xPowSpec./abs(xPowSpec))));
+    xPowSpecNorm = xPowSpec./abs(xPowSpec);
+    xPowSpecFilteredPadded = zero_pad_3D_fft(xPowSpecNorm.*OTF3DFilter,p.upSampFact);
+    xCorr = fftshift3(real(ifft3(xPowSpecFilteredPadded)));    
     
+    imagesc(squeeze(xCorr(end/2+1,:,:))');
+    axis equal; drawnow
+    pause(.01)
     
-
-    
-    % Report Peak
+    % Collect maximum subscripts in xCorr
     [~,maxIdx] = max(xCorr(:));
     [y,x,z] = ind2sub(size(xCorr),maxIdx);
-    disp(z)
+    xList(tIdx) = x;
+    yList(tIdx) = y;
+    zList(tIdx) = z;
     
 end
 

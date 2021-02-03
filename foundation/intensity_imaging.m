@@ -23,7 +23,7 @@ for focalPlaneIdx = 1:numFocalPlanes
 end
 
 % Compute images from spectra
-imgIntensity = imag(fft2(imgIntensitySpectrumStack));
+imgIntensity = real(fft2(imgIntensitySpectrumStack));
 
 % Add some Gaussian noise
 signalRange = max(imgIntensity(:)) - min(imgIntensity(:));
