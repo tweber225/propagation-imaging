@@ -19,7 +19,7 @@ centerStartPos = [(rand(1,1,1,1,objStruct.particleCount)-.5)*(x(end)-x(1)); ...
     (rand(1,1,1,1,objStruct.particleCount)-.5)*(z(end)-z(1))];
 
 
-centerPos = centerStartPos + objStruct.velocity.*t;
+centerPos = centerStartPos + 8*objStruct.velocity.*cos(t/20);
 
 % Evaluate each separate sphere boundary (have to loop because of memory
 % constraints)

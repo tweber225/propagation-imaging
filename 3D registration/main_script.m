@@ -19,7 +19,7 @@ movingObject = create_spherical_moving_object(d.posIdx,d.zPosIdx,p.obj);
 OTF = OTFp(p.sfCutoff,p.sfCutoffi,p.k,d.zPosIdx,d.sfIdx,'asym');
 
 % Perform 3D imaging + noise
-imgs = intensity_imaging(movingObject,p.zPixSize,OTF,p.focalPlanes,p.noiseLevel);
+imgs = intensity_imaging_moving(movingObject,p.zPixSize,OTF,p.focalPlanes,p.noiseLevel);
 
 % Crop laterally
 imgs = crop_images(imgs,p.cropFraction);
@@ -37,8 +37,9 @@ OTF3DFilter = generate_3D_OTF_filter(p.sfCutoff,p.sfCutoffi,p.k,p.focalPlanes,cr
 
 
 % Cross correlate first stack with each subsequent
+clear xList yList zList
 for tIdx = 2:size(imgs,4)
-    % Perform frequency-domain cross correlation and upsample
+    % Perform frequency-domain cross correlation and upsample 
     xPowSpec = spectra(:,:,:,1).*conj(spectra(:,:,:,tIdx));
     xPowSpecNorm = xPowSpec./abs(xPowSpec);
     xPowSpecFilteredPadded = zero_pad_3D_fft(xPowSpecNorm.*OTF3DFilter,p.upSampFact);
