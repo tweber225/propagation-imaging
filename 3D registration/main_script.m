@@ -19,7 +19,7 @@ movingObject = create_spherical_moving_object(d.posIdx,d.zPosIdx,p.obj);
 OTF = OTFp(p.sfCutoff,p.sfCutoffi,p.k,d.zPosIdx,d.sfIdx,'asym');
 
 % Perform 3D imaging + noise
-imgs = intensity_imaging_moving(movingObject,p.zPixSize,OTF,p.focalPlanes,p.noiseLevel);
+imgs = intensity_imaging_moving(movingObject,p.zPixSize,OTF,p.blurFocalPlanes,p.noiseLevel);
 
 % Crop laterally
 imgs = crop_images(imgs,p.cropFraction);

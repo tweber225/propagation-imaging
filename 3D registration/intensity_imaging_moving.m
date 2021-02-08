@@ -1,25 +1,38 @@
-function imgIntensity = intensity_imaging_moving(object,pixSize,OTF,focalPlaneLocations,numTimesPerFrame,noiseLevel)
+function imgIntensity = intensity_imaging_moving(object,pixSize,OTF,focalPlaneLocations,noiseLevel)
 
-numFocalPlanes = numel(focalPlaneLocations);
+numRealFocalPlanes = size(focalPlaneLocations,2); % The number of real frames per stack
+numTimesPerFrame = size(focalPlaneLocations,1); % Oversampling to approximate motion blur, the extra frames are summed into a single frame
+numFramesPerStack = numRealFocalPlanes*numTimesPerFrame;
+numStacks = size(object,4)/(numTimesPerFrame*numRealFocalPlanes); % number of actual acquired stacks
 
 % 2D Fourier transform object
 objSpec= fft2(single(object));
 
-% Allocate some space for the imaged spectra
-imgIntensitySpectrumStack = complex(zeros(size(object,1),size(object,2),numFocalPlanes,size(object,4)/numFocalPlanes,'single'));
+% Allocate space for the set of stacks (captured 3D image sets)
+imgIntensitySpectrumStack = 
 
-% Create each focal plane intensity image
-for focalPlaneIdx = 1:numFocalPlanes
-    focalPlaneOffset = focalPlaneLocations(focalPlaneIdx);
-    zPixelShift = focalPlaneOffset./pixSize;
+% Create each stack
+for stackIdx = 1:numStacks
+    stackStartTimeIdx = (stackIdx-1)*numFramesPerStack;
     
-    % Move object in Z
-    shiftedObjectSpectrum = circshift(objSpec(:,:,:,focalPlaneIdx:numFocalPlanes:end),zPixelShift,3);
-    
-    % Multiply shifted object spectrum by depth-dependent OTF, and
-    % integrate along z
-    imgIntensitySpectrumStack(:,:,focalPlaneIdx,:) = sum(shiftedObjectSpectrum.*OTF,3);
-    
+    % Create each sub-focal plane intensity image
+    for focalPlaneIdx = 1:numRealFocalPlanes
+        focalPlaneOffsets = focalPlaneLocations(:,focalPlaneIdx);
+        zPixelShift = focalPlaneOffsets./pixSize;
+
+        % Move object in Z
+        timeSelection = stackStartTimeIdx + (focalPlaneIdx-1)*numTimesPerFrame + 1:numTimesPerFrame;
+        shiftedObjectSpectrum = circshift(objSpec(:,:,:,timeSelection),zPixelShift,3);
+
+        % Multiply shifted object spectrum by depth-dependent OTF, and
+        % integrate along z
+        imgIntensitySpectrum = sum(shiftedObjectSpectrum.*OTF,3);
+        
+        % Inverse FT to make real images and sum in (sub-frame) time
+        imgIntensity(:,:,focalPlaneIdx,
+
+    end
+
 end
 
 % Compute images from spectra

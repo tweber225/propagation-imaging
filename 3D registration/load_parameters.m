@@ -32,5 +32,10 @@ p.sfCutoff = single(p.NA/p.wl);
 p.sfCutoffi = single(p.NAi/p.wl); 
 
 % Compute the sub-focal plane planes
-fp = [p.focalPlanes,2*p.focalPlanes(end)-p.focalPlanes(end-1)];
-p.blurFocalPlanes = [fp(1:end-1);fp(1:end-1)+diff(fp)/p.obj.numTimesPerFrame]; % All the planes to image at to include motion blur
+fp = [p.focalPlanes,2*p.focalPlanes(end)-p.focalPlanes(end-1)]; % extrapolate one more real focal plane location
+extraFocalPlanes = (1:p.obj.numTimesPerFrame-1)'.*diff(fp)/p.obj.numTimesPerFrame;
+p.blurFocalPlanes = [fp(1:end-1);fp(1:end-1) + extraFocalPlanes]; % All the planes to image at in order to include motion blur
+clear extraFocalPlanes fp
+
+
+
