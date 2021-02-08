@@ -1,9 +1,9 @@
-function imgIntensity = intensity_imaging_moving(object,pixSize,OTF,focalPlaneLocations,noiseLevel)
+function imgIntensity = intensity_imaging_moving(object,pixSize,OTF,focalPlaneLocations,numTimesPerFrame,noiseLevel)
 
 numFocalPlanes = numel(focalPlaneLocations);
 
 % 2D Fourier transform object
-objSpec= fft2(object);
+objSpec= fft2(single(object));
 
 % Allocate some space for the imaged spectra
 imgIntensitySpectrumStack = complex(zeros(size(object,1),size(object,2),numFocalPlanes,size(object,4)/numFocalPlanes,'single'));
@@ -24,6 +24,8 @@ end
 
 % Compute images from spectra
 imgIntensity = real(fft2(imgIntensitySpectrumStack));
+
+% Blur frames
 
 % Add some Gaussian noise
 signalRange = max(imgIntensity(:)) - min(imgIntensity(:));
