@@ -11,50 +11,70 @@ load_parameters
 d = set_up_domains(p); 
 
 
-%% Generate 3D Images
-% Create the object 
-movingObject = create_spherical_moving_object(d.posIdx,d.zPosIdx,p.obj);
+%% Load 3D Images
+% Form filename, and load the interleaved stack
+saveDirAndName = [cd filesep 'stacks.tif'];
+interleavedStack = load_tiff_stack(saveDirAndName);
 
-% Create 3D asymmetric phase OTF
-OTF = OTFp(p.sfCutoff,p.sfCutoffi,p.k,d.zPosIdx,d.sfIdx,'asym');
+% Deinterleave and convert to floating point
+imgs = single(reshape(interleavedStack,[size(interleavedStack,1),size(interleavedStack,2),numel(p.focalPlanes),p.obj.numStacks]));
 
-% Perform 3D imaging + noise
-imgs = intensity_imaging_moving(movingObject,p.zPixSize,OTF,p.blurFocalPlanes,p.noiseLevel);
+%% 3D registration & auto-mosiacing
 
-% Crop laterally
-imgs = crop_images(imgs,p.cropFraction);
-
-
-
-%% Attempt to 3D register
+% Remove background & zero pad
+bg = 128;
+imgsPadded = padarray(imgs - bg,[size(imgs,1),size(imgs,2),size(imgs,3)]/2,0,'both');
 
 % Compute 3D Fourier Transform of each image stack
-spectra = fft3(imgs);
+spectra = fft3(imgsPadded);
 
 % Generate filtering function from the phase OTF
-cropSfIdx = d.sfIdx(1:1/p.cropFraction:end);
-OTF3DFilter = generate_3D_OTF_filter(p.sfCutoff,p.sfCutoffi,p.k,p.focalPlanes,cropSfIdx,p.filterThreshold);
+% Make new spatial frequency index
+dSf = single(2*d.maxSf/(2*p.numLatPix));
+cropSfIdx = -d.maxSf:dSf:(d.maxSf-dSf);
+% Extrapolate extra focal planes for padding
+bottomExtraPlanes = (p.focalPlanes(2)-p.focalPlanes(1))*(-numel(p.focalPlanes)/2:1:-1) + p.focalPlanes(1);
+topExtraPlanes = (p.focalPlanes(end)-p.focalPlanes(end-1))*(1:numel(p.focalPlanes)/2) + p.focalPlanes(end);
+registeredFocalPlanes = [bottomExtraPlanes p.focalPlanes topExtraPlanes];
+OTF3DFilter = generate_3D_OTF_filter(p.sfCutoff,p.sfCutoffi,p.k,registeredFocalPlanes,cropSfIdx,p.filterThreshold);
 
+% Initialize the summing stack with the first frame
+sumStack = imgsPadded(:,:,:,1);
 
-% Cross correlate first stack with each subsequent
-clear xList yList zList
+% Also track how many samples averaged at each data point, initialize with
+% just the data at first stack location
+onesStack = ones(size(imgs(:,:,:,1)),'single');
+onesStack = padarray(onesStack,[size(imgs,1),size(imgs,2),size(imgs,3)]/2,0,'both');
+numAveragedSamplesStack = onesStack;
+
+% Cross correlate average stack with each subsequent frame
 for tIdx = 2:size(imgs,4)
+    % Calculate the new "average" stack
+    avgStack = sumStack./(numAveragedSamplesStack+eps);
+    
     % Perform frequency-domain cross correlation and upsample 
-    xPowSpec = spectra(:,:,:,1).*conj(spectra(:,:,:,tIdx));
+    xPowSpec = fft3(avgStack).*conj(spectra(:,:,:,tIdx));
     xPowSpecNorm = xPowSpec./abs(xPowSpec);
     xPowSpecFilteredPadded = zero_pad_3D_fft(xPowSpecNorm.*OTF3DFilter,p.upSampFact);
     xCorr = fftshift3(real(ifft3(xPowSpecFilteredPadded)));    
     
-    imagesc(squeeze(xCorr(end/2+1,:,:))');
-    axis equal; drawnow
-    pause(.01)
-    
     % Collect maximum subscripts in xCorr
     [~,maxIdx] = max(xCorr(:));
     [y,x,z] = ind2sub(size(xCorr),maxIdx);
-    xList(tIdx) = x;
-    yList(tIdx) = y;
-    zList(tIdx) = z;
+    
+    % Shift the stack and sum into sumStack
+    shiftAmounts = [y,x,z] - [size(sumStack,1)/2+1,size(sumStack,2)/2+1,size(sumStack,3)/2+1];
+    sumStack = sumStack + circshift(imgsPadded(:,:,:,tIdx),-shiftAmounts);
+    
+    % Shift the onesStack and add to numAveragedStack
+    numAveragedSamplesStack = numAveragedSamplesStack + circshift(onesStack,-shiftAmounts);
+    
+    imagesc(avgStack(:,:,8));axis equal;colormap gray
+    drawnow
+    pause(.05)
     
 end
+
+% Calculate one last average stack
+avgStack = sumStack./(numAveragedSamplesStack+eps);
 

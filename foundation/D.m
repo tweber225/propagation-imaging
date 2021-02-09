@@ -5,7 +5,12 @@ function out = D(sfIdx,k,z)
 
 thisKz = k_z(k,sfIdx);
 
-z3 = permute(z,[3 4 2 1]);
+if size(z,2) ~= 1
+    z3 = permute(z,[3 4 2 1]);
+else
+    z3 = z;
+end
+
 expArg = 2i*pi*z3.*thisKz; % implicitly expand into 3rd dimension
 
 out = exp(expArg);
