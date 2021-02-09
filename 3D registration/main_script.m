@@ -19,6 +19,9 @@ interleavedStack = load_tiff_stack(saveDirAndName);
 % Deinterleave and convert to floating point
 imgs = single(reshape(interleavedStack,[size(interleavedStack,1),size(interleavedStack,2),numel(p.focalPlanes),p.obj.numStacks]));
 
+% Add some extra noise
+imgs = imgs + 20*randn(size(imgs));
+
 %% 3D registration & auto-mosiacing
 
 % Remove background & zero pad
@@ -29,10 +32,10 @@ imgsPadded = padarray(imgs - bg,[size(imgs,1),size(imgs,2),size(imgs,3)]/2,0,'bo
 spectra = fft3(imgsPadded);
 
 % Generate filtering function from the phase OTF
-% Make new spatial frequency index
+% Make new spatial frequency index (for the larger zero-padded space)
 dSf = single(2*d.maxSf/(2*p.numLatPix));
 cropSfIdx = -d.maxSf:dSf:(d.maxSf-dSf);
-% Extrapolate extra focal planes for padding
+% Extrapolate extra focal planes (also for zero-padded space)
 bottomExtraPlanes = (p.focalPlanes(2)-p.focalPlanes(1))*(-numel(p.focalPlanes)/2:1:-1) + p.focalPlanes(1);
 topExtraPlanes = (p.focalPlanes(end)-p.focalPlanes(end-1))*(1:numel(p.focalPlanes)/2) + p.focalPlanes(end);
 registeredFocalPlanes = [bottomExtraPlanes p.focalPlanes topExtraPlanes];
@@ -47,7 +50,7 @@ onesStack = ones(size(imgs(:,:,:,1)),'single');
 onesStack = padarray(onesStack,[size(imgs,1),size(imgs,2),size(imgs,3)]/2,0,'both');
 numAveragedSamplesStack = onesStack;
 
-% Cross correlate average stack with each subsequent frame
+% Cross correlate developing average stack with each subsequent stack
 for tIdx = 2:size(imgs,4)
     % Calculate the new "average" stack
     avgStack = sumStack./(numAveragedSamplesStack+eps);
@@ -71,7 +74,6 @@ for tIdx = 2:size(imgs,4)
     
     imagesc(avgStack(:,:,8));axis equal;colormap gray
     drawnow
-    pause(.05)
     
 end
 
