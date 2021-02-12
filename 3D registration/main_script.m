@@ -19,6 +19,12 @@ interleavedStack = load_tiff_stack(saveDirAndName);
 % Deinterleave and convert to floating point
 imgs = single(reshape(interleavedStack,[size(interleavedStack,1),size(interleavedStack,2),numel(p.focalPlanes),p.obj.numStacks]));
 
+% Add extra noise
+imgs = imgs + 6*randn(size(imgs));
+
+% Select focal planes
+imgs = imgs(:,:,find(p.focalPlanes == p.regFocalPlanes(1)):find(p.focalPlanes == p.regFocalPlanes(end)),:);
+
 %% 3D registration & auto-mosiacing
 
 % Remove background & zero pad
@@ -33,9 +39,9 @@ spectra = fft3(imgsPadded);
 dSf = single(2*d.maxSf/(2*p.numLatPix));
 cropSfIdx = -d.maxSf:dSf:(d.maxSf-dSf);
 % Extrapolate extra focal planes for padding
-bottomExtraPlanes = (p.focalPlanes(2)-p.focalPlanes(1))*(-numel(p.focalPlanes)/2:1:-1) + p.focalPlanes(1);
-topExtraPlanes = (p.focalPlanes(end)-p.focalPlanes(end-1))*(1:numel(p.focalPlanes)/2) + p.focalPlanes(end);
-registeredFocalPlanes = [bottomExtraPlanes p.focalPlanes topExtraPlanes];
+bottomExtraPlanes = mean(diff(p.regFocalPlanes))*(-numel(p.regFocalPlanes)/2:1:-1) + p.regFocalPlanes(1);
+topExtraPlanes = mean(diff(p.regFocalPlanes))*(1:numel(p.regFocalPlanes)/2) + p.regFocalPlanes(end);
+registeredFocalPlanes = [bottomExtraPlanes p.regFocalPlanes topExtraPlanes];
 OTF3DFilter = generate_3D_OTF_filter(p.sfCutoff,p.sfCutoffi,p.k,registeredFocalPlanes,cropSfIdx,p.filterThreshold);
 
 % Initialize the summing stack with the first frame
@@ -54,12 +60,12 @@ for tIdx = 2:size(imgs,4)
     
     % Perform frequency-domain cross correlation and upsample 
     xPowSpec = fft3(avgStack).*conj(spectra(:,:,:,tIdx));
-    xPowSpecNorm = xPowSpec./abs(xPowSpec);
+    xPowSpecNorm = xPowSpec./(abs(xPowSpec) + eps('single'));
     xPowSpecFilteredPadded = zero_pad_3D_fft(xPowSpecNorm.*OTF3DFilter,p.upSampFact);
     xCorr = fftshift3(real(ifft3(xPowSpecFilteredPadded)));    
     
     % Collect maximum subscripts in xCorr
-    [~,maxIdx] = max(xCorr(:));
+    [maxVal,maxIdx] = max(xCorr(:));
     [y,x,z] = ind2sub(size(xCorr),maxIdx);
     
     % Shift the stack and sum into sumStack
@@ -69,7 +75,7 @@ for tIdx = 2:size(imgs,4)
     % Shift the onesStack and add to numAveragedStack
     numAveragedSamplesStack = numAveragedSamplesStack + circshift(onesStack,-shiftAmounts);
     
-    imagesc(avgStack(:,:,8));axis equal;colormap gray
+    imagesc(avgStack(:,:,4));axis equal;colormap gray
     drawnow
     pause(.05)
     

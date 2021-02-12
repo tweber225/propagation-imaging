@@ -26,9 +26,9 @@ OTF = OTFp(p.sfCutoff,p.sfCutoffi,p.k,zPosToEvaluate,d.sfIdx,'asym');
 %% Set up object
 % Make random center starting positions (I sincerely apologize about how
 % ridiculous the indexing is getting here). Dim7 = particle index
-p.obj.centerStartPos = [2*(rand(1,1,1,1,1,1,p.obj.particleCount)-.5)*(d.posIdx(end)-d.posIdx(1)); ...
-    2*(rand(1,1,1,1,1,1,p.obj.particleCount)-.5)*(d.posIdx(end)-d.posIdx(1)); ...
-    2*(rand(1,1,1,1,1,1,p.obj.particleCount)-.5)*(d.zPosIdx(end)-d.zPosIdx(1))];
+p.obj.centerStartPos = [1.8*(rand(1,1,1,1,1,1,p.obj.particleCount)-.5)*(d.posIdx(end)-d.posIdx(1)); ...
+    1.8*(rand(1,1,1,1,1,1,p.obj.particleCount)-.5)*(d.posIdx(end)-d.posIdx(1)); ...
+    1.8*(rand(1,1,1,1,1,1,p.obj.particleCount)-.5)*(d.zPosIdx(end)-d.zPosIdx(1))];
 
 %% Generate intensity images
 
@@ -39,7 +39,7 @@ for stackIdx = 1:p.obj.numStacks
     disp(['Generating stack ' num2str(stackIdx) ' of ' num2str(p.obj.numStacks)])
     
     % Create the object 
-    movingObject = create_spherical_moving_object(d.posIdx,d.zPosIdx,stackIdx,p.obj,p.subFrameFocalPlanes);
+    movingObject =  (d.posIdx,d.zPosIdx,stackIdx,p.obj,p.subFrameFocalPlanes);
 
     % Perform 3D imaging + noise
     imgs(:,:,:,stackIdx) = intensity_imaging_moving(movingObject,OTF,p.obj.dn,p.subFrameFocalPlanes,p.noiseLevel);
